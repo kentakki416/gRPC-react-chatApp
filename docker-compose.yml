@@ -1,0 +1,52 @@
+version: "3.8"
+services:
+  # フロントエンドが通信するgRPC-Web対応のEnvoyプロキシを起動
+  envoy:
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile.envoy
+    # Envoyの管理GUIにアクセスするための9901番とプロキシを動かす9090番を解放
+    ports:
+      - 9090:9090
+      - 9091:9091
+
+  # チャットメッセージを保存するためのDBとしてFirestoreのエミューレータを利用
+  db:
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile.firestore
+    # Firebase管理GUIにアクセスするための8000番とFirestoreを立ち上げる4000番を解放
+    ports:
+      - 8000:8000
+      - 4000:4000
+    volumes:
+      - .:/app
+
+  # gRPCサーバー（Go）を起動
+  server:
+    build:
+      context: .
+      target: dev #ビルド名を追加
+      dockerfile: ./docker/Dockerfile.server
+    tty: true
+    expose:
+      - 8080
+    ports:
+      - 8080:8080
+    environment:
+      PROJECT_ID: foo
+      FIRESTORE_EMULATOR_HOST: host.docker.internal:8000
+    command: ["air"]
+    volumes:
+      - ./server:/go/src/app
+
+  # フロントエンド（React）を配信する開発サーバーを起動
+  client:
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile.client
+    expose:
+      - 3000
+    ports:
+      - 3000:3000
+    command: ["npm", "run", "start"]
