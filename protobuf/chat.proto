@@ -1,0 +1,36 @@
+// protoのバージョン
+syntax = "proto3";
+
+// Googleが定義したパッケージとして公開した便利型を利用
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+
+// コードが自動生成されるディレクトリ指定
+option go_package = "./";
+
+// 名前衝突を避けるためにパッケージ名を指定
+package chat.v1;
+
+// RPCをまとめて一括りにしたものをサービス
+service ChatService {
+    rpc GetMessageStream (google.protobuf.Empty) returns (stream GetMessageStreamResponse);
+    rpc CreateMessage (CreateMessageRequest) returns (CreateMessageResponse);
+}
+
+message Message{
+    string from = 1; // 送信者
+    string message_content = 2; // メッセージ内容
+    google.protobuf.Timestamp created_at = 3; //作成日時
+}
+
+message GetMessageStreamResponse {
+    Message message = 1;
+}
+
+message CreateMessageRequest {
+    Message message = 1;
+}
+
+message CreateMessageResponse {
+    string result = 1;
+}
