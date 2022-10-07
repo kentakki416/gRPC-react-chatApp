@@ -42,6 +42,14 @@ gRPCを活用したチャットアプリ
 ❯ docker run -v $PWD:/defs namely/protoc-all -f protobuf/chat.proto -o ./client/src/pb -l web
 ```
  
+ Goのプロとコンパイラプラグインのインストール
+
+ ```
+ go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.26
+ go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.1
+
+ export PATH="$PATH:$(go env GOPATH)/bin"
+ ```
 # Usage
  
 DEMOの実行方法など、"hoge"の基本的な使い方を説明する
