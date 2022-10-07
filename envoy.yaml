@@ -1,10 +1,10 @@
-# 管理GUI
+# https://github.com/grpc/grpc-web/blob/master/net/grpc/gateway/examples/echo/envoy.yaml
+# https://qiita.com/yutachaos/items/b982575971746c222864
 admin:
   access_log_path: /tmp/admin_access.log
   address:
     socket_address: { address: 0.0.0.0, port_value: 9901 }
 
-# Envoyプロキシ
 static_resources:
   listeners:
     - name: listener_0
@@ -46,20 +46,18 @@ static_resources:
                 - name: envoy.filters.http.router
                   typed_config:
                     "@type": type.googleapis.com/envoy.extensions.filters.http.router.v3.Router
-
-# プロキシのバックエンド（今回の場合であればGoのgRPCサーバ）
-clusters:
-- name: grpc_service
-  connect_timeout: 0.25s
-  type: logical_dns
-  http2_protocol_options: {}
-  lb_policy: round_robin
-  load_assignment:
-    cluster_name: cluster_0
-    endpoints:
-      - lb_endpoints:
-        - endpoint:
-            address:
-              socket_address:
-                address: host.docker.internal
-                port_value: 8080
+  clusters:
+    - name: grpc_service
+      connect_timeout: 0.25s
+      type: logical_dns
+      http2_protocol_options: {}
+      lb_policy: round_robin
+      load_assignment:
+        cluster_name: cluster_0
+        endpoints:
+          - lb_endpoints:
+            - endpoint:
+                address:
+                  socket_address:
+                    address: host.docker.internal
+                    port_value: 8080
